@@ -5,12 +5,29 @@ const moment = require("moment");
 const { pool } = require("../modules/mysql-conn");
 const { alert } = require("../modules/util")
 
-router.get(["","/list"], (req,res,next) => {  //경로를 두가지 이상 쓰고 싶다면 배열로 쓰면 된다.
-    const pugVals = {
+router.get(["","/list"], async (req,res,next) => {  //경로를 두가지 이상 쓰고 싶다면 배열로 쓰면 된다.
+    let pugVals = {
         cssFile : "board",
         jsFile : "board"
     }
+    let sql = "SELECT * FROM board ORDER BY id DESC"; //보더에 있는 아이디를 내림차순으로 정렬해서 가져와라.
+    let connect, result
+    try {
+    connect = await pool.getConnection();
+    result = await connect.query(sql);
+    connect.release();
+    let lists = result[0].map((v)=> {
+        v.created = moment(v.created).format("YYYY-MM-DD");
+        return v;
+    })
+    pugVals.lists = lists;
+    //res.json(result[0]);
     res.render("board/list.pug", pugVals)
+    }
+    catch(err) {
+        connect.release();
+        next(err);
+    }
 })
 
 router.get("/write", (req,res,next) => {
@@ -33,8 +50,8 @@ router.post("/save", async(req,res,next) => {
     try {
         connect = await pool.getConnection();
         result = await connect.query(sql,values);
-        connect.release();
         //res.json(result);
+        connect.release();
         if(result[0].affectedRows > 0) res.send(alert("저장되었습니다.","/board"));
         else res.send(alert("에러발생","/board"));
     } 

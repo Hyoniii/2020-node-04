@@ -19,3 +19,15 @@ ul {
 .wr-lists textarea {
     min-height: 150px;
 }
+.list-tb th:nth-child(1) {
+    width:10%
+}
+.list-tb th:nth-child(3) {
+    width:15%
+}
+.list-tb th:nth-child(4) {
+    width:15%
+}
+.list-tb th:nth-child(5) {
+    width:10%
+}
