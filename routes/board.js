@@ -61,4 +61,46 @@ router.post("/save", async(req,res,next) => {
     }
 })
 
+router.get("/view/:id", async (req,res,next) => {
+    let id = req.params.id;
+    let pugVals = {
+        cssFile : "board",
+        jsFile : "board"
+    }
+    let sql ="SELECT * FROM board WHERE id=?";
+    let connect, result;
+    try {
+        connect = await pool.getConnection();
+        result = await connect.query(sql,[id]);
+        connect.release();
+        //res.json(result[0]);
+        pugVals.data = result[0][0]
+        pugVals.data.created = moment(pugVals.data.created).format("YYYY-MM-DD HH:mm:ss");
+        res.render("board/view.pug",pugVals)
+    }
+    catch(err) {
+        connect.release();
+        next(err);
+
+    }
+})
+
+router.get("/remove/:id", async (req,res,next) => {
+    let id = req.params.id;
+    let sql = "DELETE FROM board WHERE id=?";
+    let connect, result;
+    try{
+        connect = await pool.getConnection();
+        result = await connect.query(sql,[id]);
+        connect.release();
+        //res.json(result);
+        if(result[0].affectedRows == 1) res.send(alert("삭제되었습니다." , "/board"));
+        else res.send(alert("삭제가 실행되지 않았습니다.관리자에게 문의하세요","/board"));
+    } 
+    catch(err) {
+        connect.release();
+        next(err);
+    }
+})
+
 module.exports = router

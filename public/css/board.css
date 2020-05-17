@@ -31,3 +31,13 @@ ul {
 .list-tb th:nth-child(5) {
     width:10%
 }
+.view-info .title {
+    font-weight:  bold;
+    margin-right: 12px;
+}
+.view-info .content {
+    font-size: 18px;;
+}
+.board-link {
+    cursor: pointer;
+}
