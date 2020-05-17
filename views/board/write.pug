@@ -1,3 +1,24 @@
 extends ../layout/default.pug
 block content
-    h1 WRITE
+    .jumbotron
+        h1 게시글 보기  
+            small (list)
+    .container
+        form(action="/board/save" name="wrForm" method="post" onsubmit="return onSubmit(this);")
+            ul.wr-lists
+                li.wr-list.d-flex
+                    .title.p-3.bg-dark.text-light 제목
+                    .content.p-1
+                        input.form-control(type="text" placeholder="제목을 작성해주세요." name="title")
+                li.wr-list.d-flex
+                    .title.p-3.bg-dark.text-light 작성자
+                    .content.p-1
+                        input.form-control(type="text" placeholder="작성자를 입력해주세요." name="writer")
+                li.wr-list.d-flex
+                    .title.p-3.bg-dark.text-light 내용
+                    .content.p-1
+                        textarea.form-control(placeholder="내용을 입력해주세요." name="comment")
+                li.text-center.p-5
+                    button.btn.btn-primary 저장
+                    button(type="reset").btn.btn-danger 다시작성
+            

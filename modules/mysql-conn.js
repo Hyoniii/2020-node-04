@@ -9,4 +9,4 @@ const pool = mysql.createPool({
     connectionLimit:10,
 });
 
-module.express = { mysql, pool };
+module.exports = { mysql, pool };
