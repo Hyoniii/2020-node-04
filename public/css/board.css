@@ -41,3 +41,40 @@ ul {
 .board-link {
     cursor: pointer;
 }
+.pager-wrap {
+    margin-top: 40px;
+}
+.pager-wrap a {
+    text-decoration: none;
+    color:black;
+}
+.pager-wrap a:link {
+    text-decoration: none;
+    color:black;
+}
+.pager-wrap a:hover {
+    text-decoration: none;
+    color:rgb(255, 208, 0);
+}
+.pager-wrap > div {
+    width:30px;
+    height: 30px;
+    border:1px solid #ccc ;
+    text-align: center;
+    line-height:30px;
+    margin-right: -1px;
+}
+.pager-wrap> .bt-page.active {
+    background-color: #222;
+ }
+.pager-wrap> .bt-page.active>a,
+.pager-wrap> .bt-page.active>a:link
+.pager-wrap> .bt-page.active>a:hover {
+    color:#fff
+}
+.pager-wrap > .bt-first,
+.pager-wrap > .bt-prev,
+.pager-wrap > .bt-next,
+.pager-wrap > .bt-last {
+    background-color:#eee
+}

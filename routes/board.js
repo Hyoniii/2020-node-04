@@ -4,18 +4,26 @@ const router = express.Router();
 const moment = require("moment");
 const { pool } = require("../modules/mysql-conn");
 const { alert } = require("../modules/util")
+const pager = require("../modules/pager")
 
-router.get(["","/list"], async (req,res,next) => {  //경로를 두가지 이상 쓰고 싶다면 배열로 쓰면 된다.
+router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 두가지 이상 쓰고 싶다면 배열로 쓰면 된다.
+    let page = req.params.page ? Number(req.params.page) : 1;
     let pugVals = {
         cssFile : "board",
         jsFile : "board"
     }
-    let sql = "SELECT * FROM board ORDER BY id DESC"; //보더에 있는 아이디를 내림차순으로 정렬해서 가져와라.
-    let connect, result
+    let connect, result,sql,total
     try {
-    connect = await pool.getConnection();
-    result = await connect.query(sql);
-    connect.release();
+        connect = await pool.getConnection();
+        sql = "SELECT count(id) FROM board"; //보더에 있는 아이디를 내림차순으로 정렬해서 가져와라.
+        result = await connect.query(sql);
+        total = result[0][0]["count(id)"];
+        pagerValues = pager({page,total,list:3, grp:3})
+        res.json(pagerValues);
+        /*
+        sql = "SELECT * FROM board ORDER BY id DESC LIMIT ?,?";
+        result = await connect.query(sql,[pagerValues.stIdx, pagerValues.list]);
+        connect.release();
     let lists = result[0].map((v)=> {
         v.created = moment(v.created).format("YYYY-MM-DD");
         return v;
@@ -23,7 +31,7 @@ router.get(["","/list"], async (req,res,next) => {  //경로를 두가지 이상
     pugVals.lists = lists;
     //res.json(result[0]);
     res.render("board/list.pug", pugVals)
-    }
+    }*/}
     catch(err) {
         connect.release();
         next(err);
