@@ -1,4 +1,7 @@
 function onSubmit(f) {
+    if(f.id) {
+        f.action = "/board/put"; //수정을 위한 라우터
+    }
     if(f.title.value.trim() === ""){
         alert("제목을 입력하세요.")
         f.title.focus();

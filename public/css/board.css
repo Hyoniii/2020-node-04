@@ -63,6 +63,8 @@ ul {
     text-align: center;
     line-height:30px;
     margin-right: -1px;
+    cursor: pointer
+
 }
 .pager-wrap> .bt-page.active {
     background-color: #222;
@@ -77,4 +79,11 @@ ul {
 .pager-wrap > .bt-next,
 .pager-wrap > .bt-last {
     background-color:#eee
+}
+.pager-wrap > .bt-first > a.disabled,
+.pager-wrap > .bt-prev > a.disabled,
+.pager-wrap > .bt-next > a.disabled,
+.pager-wrap > .bt-last > a.disabled {
+    color:#999;
+    cursor: default
 }

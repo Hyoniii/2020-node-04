@@ -8,6 +8,7 @@ const pager = require("../modules/pager")
 
 router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 두가지 이상 쓰고 싶다면 배열로 쓰면 된다.
     let page = req.params.page ? Number(req.params.page) : 1;
+    req.app.locals.page = page;
     let pugVals = {
         cssFile : "board",
         jsFile : "board"
@@ -19,8 +20,8 @@ router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 �
         result = await connect.query(sql);
         total = result[0][0]["count(id)"];
         pagerValues = pager({page,total,list:3, grp:3})
-        res.json(pagerValues);
-        /*
+        pugVals.pager = pagerValues;
+        //res.json(pagerValues);
         sql = "SELECT * FROM board ORDER BY id DESC LIMIT ?,?";
         result = await connect.query(sql,[pagerValues.stIdx, pagerValues.list]);
         connect.release();
@@ -31,7 +32,7 @@ router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 �
     pugVals.lists = lists;
     //res.json(result[0]);
     res.render("board/list.pug", pugVals)
-    }*/}
+    }
     catch(err) {
         connect.release();
         next(err);
@@ -44,6 +45,24 @@ router.get("/write", (req,res,next) => {
         jsFile : "board"
     }
     res.render("board/write.pug", pugVals)
+})
+router.get("/update/:id", async(req,res,next) => {
+    let pugVals = {
+        cssFile : "board",
+        jsFile : "board"
+    }
+    let sql,connect,result;
+    sql = "SELECT * FROM board WHERE id="+req.params.id;
+    try {
+        connect = await pool.getConnection();
+        result = await connect.query(sql);
+        connect.release();
+        pugVals.list = result[0][0];
+        res.render("board/write.pug", pugVals)
+    } catch(err) {
+        connect.release();
+        next(err);
+    }
 })
 
 router.post("/save", async(req,res,next) => {
@@ -61,6 +80,25 @@ router.post("/save", async(req,res,next) => {
         //res.json(result);
         connect.release();
         if(result[0].affectedRows > 0) res.send(alert("저장되었습니다.","/board"));
+        else res.send(alert("에러발생","/board"));
+    } 
+    catch(err) {
+        connect.release();  //커넥트 반납?
+        next(err);   //app.js에서 받음
+    }
+})
+
+router.post("/put",async (req,res,next) => {
+    const {title, writer, comment, id} = req.body
+    const values = [title,writer,comment, id];
+    const sql = "UPDATE board SET title=?, writer=?, comment=? WHERE id=?"; 
+    let connect, result;
+    try {
+        connect = await pool.getConnection();
+        result = await connect.query(sql,values);
+        //res.json(result);
+        connect.release();
+        if(result[0].affectedRows > 0) res.send(alert("수정되었습니다.","/board"));
         else res.send(alert("에러발생","/board"));
     } 
     catch(err) {
