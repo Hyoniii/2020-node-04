@@ -3,19 +3,8 @@ const app = express();
 const path = require("path");
 const createError = require('http-errors');
 require("dotenv").config();
-const multer = require("multer");
 
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, path.join(__dirname, "/upload")
-      )},
-    filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now())
-    }
-  })
-  
-const upload = multer({ storage })
+const upload = require("./modules/multer-conn") //모듈화 시킨 객체로 받아오기.
 
 
 
