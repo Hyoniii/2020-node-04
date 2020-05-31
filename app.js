@@ -19,6 +19,8 @@ app.locals.pretty = true;
 app.use(express.json());
 app.use(express.urlencoded({extended : false}));
 app.use("/", express.static(path.join(__dirname, "./public"))); //일종의 라우터. 근데 루트이기 때문에 라우터들 제일 위쪽에 위치해야한다.
+/* app.use("/upload", express.static(path.join(__dirname, "./upload")));  */
+app.use("/storage", express.static(path.join(__dirname, "./upload")));  
 
 /* Router */
 const boardRouter = require("./routes/board")

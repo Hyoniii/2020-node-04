@@ -4,4 +4,6 @@ const alert = (msg,location=null) => {
     ${location ? "location.href= '"+location+"';": ";"}
     </script>`;
 }
-module.exports = { alert }
+const imgExt = [".jpg", ".jpeg", ".gif", ".png"]
+const allowExt =  [...imgExt, ".pdf", ".zip"]
+module.exports = { alert, imgExt, allowExt }

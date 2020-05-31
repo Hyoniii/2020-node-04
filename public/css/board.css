@@ -87,3 +87,9 @@ ul {
     color:#999;
     cursor: default
 }
+.list-img {
+    max-width: 50px;
+    max-height: 50px;
+    width:100%;
+    margin-right: 20px;
+}

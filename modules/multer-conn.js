@@ -2,6 +2,7 @@ const fs = require("fs"); //노드가 가지고 있는 파일 처리를 위한 �
 const path = require("path");
 const moment = require("moment");
 const multer = require("multer");
+const { allowExt } = require("./util")
 
 //multer안에서 움직이는 미들웨어 두개. storage, fileFilter
 const storage = multer.diskStorage({
@@ -38,7 +39,6 @@ function makeFolder() {
     }
 
 function fileFilter(req,file,cb) {
-    const allowExt = [".jpg", ".jpeg", ".gif", ".png", ".pdf", ".zip"];
     const ext = path.extname(file.originalname).toLowerCase();
     if(allowExt.indexOf(ext) > -1) {
         cb(null,true) 
