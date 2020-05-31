@@ -7,6 +7,15 @@ const { alert, imgExt, allowExt } = require("../modules/util")
 const upload = require("../modules/multer-conn")
 const pager = require("../modules/pager")
 
+const imgSrc = (file) => {
+    if(file) {
+        if(imgExt.indexOf(path.extname(file).toLowerCase()) > -1) {
+           return "/storage/" + file.substr(0,6) + "/" + file; 
+        } else 
+        return null;
+    }}
+
+
 router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 두가지 이상 쓰고 싶다면 배열로 쓰면 된다.
     let page = req.params.page ? Number(req.params.page) : 1;
     req.app.locals.page = page;
@@ -27,19 +36,14 @@ router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 �
         sql = "SELECT * FROM board ORDER BY id DESC LIMIT ?,?";
         result = await connect.query(sql,[pagerValues.stIdx, pagerValues.list]);
         connect.release();
-    let lists = result[0].map((v)=> {
-        v.created = moment(v.created).format("YYYY-MM-DD");
-        if(v.savename) {
-            if(imgExt.indexOf(path.extname(v.savename).toLowerCase()) > -1) {
-                v.src = "/storage/" + v.savename.substr(0,6) + "/" + v.savename; 
-                
-            }
-        }
-        return v;
-    })
-    pugVals.lists = lists;
-    //res.json(result[0]);
-    res.render("board/list.pug", pugVals)
+        let lists = result[0].map((v)=> {
+            v.created = moment(v.created).format("YYYY-MM-DD");
+            if(v.savename) v.src =  imgSrc(v.savename);
+            return v;    
+        })
+        pugVals.lists = lists;
+        //res.json(result[0]);
+        res.render("board/list.pug", pugVals)
     }
     catch(err) {
         connect.release();
@@ -139,6 +143,8 @@ router.get("/view/:id", async (req,res,next) => {
         //res.json(result[0]);
         pugVals.data = result[0][0]
         pugVals.data.created = moment(pugVals.data.created).format("YYYY-MM-DD HH:mm:ss");
+        if(pugVals.data.savename) pugVals.data.src  =  imgSrc(pugVals.data.savename); //이미지 처리
+        if(pugVals.data.savename) pugVals.data.file = pugVals.data.oriname;
         res.render("board/view.pug",pugVals)
     }
     catch(err) {
@@ -165,5 +171,21 @@ router.get("/remove/:id", async (req,res,next) => {
         next(err);
     }
 })
+
+router.get("/download/:id", async(req,res,next) => {
+    const id = req.params.id;
+    const sql = "SELECT * FROM board WHERE id=" +id;
+    let connect, result;
+    try {
+        connect = await pool.getConnection();
+        result = await connect.query(sql); 
+        connect.release();
+        let realfile = path.join(__dirname, "../upload/" , result[0][0].savename.substr(0,6), result[0][0].savename);
+        res.download(realfile, result[0][0].oriname);
+    } catch(err) {
+        connect.release();
+        next(err);
+    }
+});
 
 module.exports = router
