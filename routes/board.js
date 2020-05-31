@@ -86,7 +86,10 @@ router.post("/save", upload.single("upfile"), async(req,res,next) => {
         result = await connect.query(sql,values);
         //res.json(result);
         connect.release();
-        if(result[0].affectedRows > 0) res.send(alert("저장되었습니다.","/board"));
+        if(result[0].affectedRows > 0) {
+            if(req.fileChk) res.send(alert(req.fileChk + "은(는) 업로드 할 수 없습니다. 파일 이외의 내용은 저장 되었습니다.", "/board"))
+            else res.send(alert("저장되었습니다.","/board"));
+        } 
         else res.send(alert("에러발생","/board"));
     } 
     catch(err) {

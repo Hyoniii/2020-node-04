@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const createError = require('http-errors');
+const {alert} = require("./modules/util.js")
 require("dotenv").config();
 
 /*  Server */
@@ -31,6 +32,11 @@ app.use((req,res,next)=> {  //라우터가 없기 때문에 위 과정에서 해
 
 app.use((err,req,res,next) => {
     res.locals.message = err.message   //뷰엔진의 전역변수 객체, 실제서버에서는 이부분을 지우면 된다.(클라이언트에게 안보이게)
-    res.locals.status = (err.status || 500) + " error";
-    res.render("error.pug");   //locals를 사용해서 따로 변수를 보내주지 않아도 된다.
-})
+    if (err.message == "File Too Large") {
+         res.send(alert("업로드 용량을 초과하였습니다.","/board/list"));
+    }
+    else {
+        res.render("error.pug");   //locals를 사용해서 따로 변수를 보내주지 않아도 된다.
+        res.locals.status = (err.status || 500) + " error";
+    }
+});
