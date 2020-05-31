@@ -4,6 +4,7 @@ const router = express.Router();
 const moment = require("moment");
 const { pool } = require("../modules/mysql-conn");
 const { alert } = require("../modules/util")
+const upload = require("../modules/multer-conn")
 const pager = require("../modules/pager")
 
 router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 두가지 이상 쓰고 싶다면 배열로 쓰면 된다.
@@ -65,14 +66,20 @@ router.get("/update/:id", async(req,res,next) => {
     }
 })
 
-router.post("/save", async(req,res,next) => {
+router.post("/save", upload.single("upfile"), async(req,res,next) => {
    /* const title = req.body.title //리퀘.바디로 받을 수 있는건 app에서 제이슨,유알엘엔코디드를 통해서 가능
     const writer = req.body.writer //리퀘.바디로 받을 수 있는건 app에서 제이슨,유알엘엔코디드를 통해서 가능
     const content = req.body.content //리퀘.바디로 받을 수 있는건 app에서 제이슨,유알엘엔코디드를 통해서 가능
     const created = moment().format("YYYY-MM-DD HH:mm:ss")*/
+    console.log(req.file);
     const {title, writer, comment, created=moment().format("YYYY-MM-DD HH:mm:ss")} = req.body
     const values = [title,writer,comment,created];
-    const sql = "INSERT INTO board SET title=?, writer=?, comment=?, created=?";  //created는 모멘트에서 받는 시간
+    let sql = "INSERT INTO board SET title=?, writer=?, comment=?, created=?"; //created는 모멘트에서 받는 시간
+    if(req.file) {
+        sql += " , oriname=?, savename=? "
+        values.push(req.file.originalname);
+        values.push(req.file.filename);
+    } 
     let connect, result;
     try {
         connect = await pool.getConnection();

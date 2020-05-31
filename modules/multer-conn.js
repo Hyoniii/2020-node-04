@@ -7,11 +7,19 @@ const storage = multer.diskStorage({
       cb(null, makeFolder())
       },
     filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now())
+      cb(null, makeFile(file))
     }
   });
 
 const upload = multer({ storage });
+
+function makeFile(file) {
+    let oriName = file.originalname;
+    let ext = path.extname(oriName); //<https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_extname_path>
+    let newName = moment().format("YYMMDD") + "-" + Date.now() + "-" + Math.floor((Math.random() * 900 + 100)) + ext;
+    return newName
+}
+
 
 function makeFolder() {
     const folderName = moment().format("YYMMDD");
