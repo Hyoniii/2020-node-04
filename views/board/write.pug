@@ -1,5 +1,6 @@
 extends ../layout/default.pug
 block content
+    script(src="https://unpkg.com/axios/dist/axios.min.js")
     .jumbotron
         if list
             h1 게시글 수정
@@ -30,7 +31,11 @@ block content
                             textarea.form-control(placeholder="내용을 입력해주세요." name="comment")
                 li.wr-list.d-flex
                     .title.p-3.bg-dark.text-light 내용
-                    .content.p-1    
+                    .content.p-1  
+                        if list && list.savename
+                            div.savefile
+                                span=list.oriname
+                                span.dt-delete.fa.fa-times(onclick=`rmFile(${list.id})`)
                         input.form-control(type="file" name="upfile" placeholder="첨부파일")
                         .file-comment.text-danger * jpg, gif, png, pdf, zip 파일만 업로드가 가능합니다.
                 li.text-center.p-5

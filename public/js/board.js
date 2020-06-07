@@ -25,4 +25,17 @@ document.querySelectorAll(".board-link").forEach(function(v) {
         location.href = "/board/view/" + this.dataset.id;
         
     })
-})
+});
+
+function rmFile(id) {
+    if(confirm('첨부파일을 삭제하시겠습니까?')) {
+		axios.get('/board/rm-file/'+id)
+		.then(function(res){
+			if(res.data.code == 200) document.querySelector('.savefile').innerHTML = '';
+			else alert('파일을 삭제하지 못했습니다. 다시 시도해 주세요.');
+		})
+		.catch(function(err){
+			console.log(err);
+		}); 
+    }
+}

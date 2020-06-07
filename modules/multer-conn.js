@@ -2,7 +2,7 @@ const fs = require("fs"); //노드가 가지고 있는 파일 처리를 위한 �
 const path = require("path");
 const moment = require("moment");
 const multer = require("multer");
-const { allowExt } = require("./util")
+const { imgExt, allowExt } = require("./util")
 
 //multer안에서 움직이는 미들웨어 두개. storage, fileFilter
 const storage = multer.diskStorage({
@@ -48,4 +48,21 @@ function fileFilter(req,file,cb) {
     }
 }
 
-module.exports = upload;
+function serverPath(fPath) {
+    return filePath = path.join(__dirname, "../upload", fPath.substr(0,6), fPath)
+}
+
+function clientPath(fPath) {
+    return filePath = path.join("/storage", fPath.substr(0,6), fPath)
+}
+
+function imgSrc(file) {
+    if(file) {
+        if(imgExt.indexOf(path.extname(file).toLowerCase()) > -1) {
+           return "/storage/" + file.substr(0,6) + "/" + file; 
+        } else 
+        return null;
+    }}
+
+
+module.exports = { upload, serverPath, clientPath, imgSrc };
