@@ -8,11 +8,13 @@ const { pool } = require("../modules/mysql-conn");
 const { alert, imgExt } = require("../modules/util")
 const {upload, serverPath, clientPath, imgSrc } = require("../modules/multer-conn")
 const pager = require("../modules/pager")
+const { isUser, isGuest, isGrant2 } = require("../modules/auth-conn")
 
 
 
 router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 두가지 이상 쓰고 싶다면 배열로 쓰면 된다.
-    let page = req.params.page ? Number(req.params.page) : 1;
+	
+	let page = req.params.page ? Number(req.params.page) : 1;
     req.app.locals.page = page;
     let pugVals = {
         cssFile : "board",
@@ -37,7 +39,8 @@ router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 �
             return v;    
         })
         pugVals.lists = lists;
-        //res.json(result[0]);
+		//res.json(result[0]);
+		pugVals.user = req.session.user;
         res.render("board/list.pug", pugVals)
     }
     catch(err) {
@@ -46,14 +49,15 @@ router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 �
     }
 })
 
-router.get("/write", (req,res,next) => {
+router.get("/write", isUser, isGrant2,(req,res,next) => {
     const pugVals = {
         cssFile : "board",
         jsFile : "board"
-    }
+	}
+	pugVals.user=req.session.user;
     res.render("board/write.pug", pugVals)
 })
-router.get('/update/:id', async (req, res, next) => {
+router.get('/update/:id', isUser, async (req, res, next) => {
 	let pugVals = {cssFile: "board", jsFile: "board"};
 	let connect, sql, result, filePath;
 	sql = "SELECT * FROM board WHERE id="+req.params.id;
@@ -65,6 +69,7 @@ router.get('/update/:id', async (req, res, next) => {
 		if(pugVals.list.savename) {
 			pugVals.list.savename = clientPath(pugVals.list.savename);
 		}
+		pugVals.user=req.session.user;
 		res.render("board/write.pug", pugVals);
 	}
 	catch (e) {
@@ -74,7 +79,7 @@ router.get('/update/:id', async (req, res, next) => {
 });
 
 
-router.post("/save", upload.single("upfile"), async(req,res,next) => {
+router.post("/save", isUser, upload.single("upfile"), async(req,res,next) => {
    /* const title = req.body.title //리퀘.바디로 받을 수 있는건 app에서 제이슨,유알엘엔코디드를 통해서 가능
     const writer = req.body.writer //리퀘.바디로 받을 수 있는건 app에서 제이슨,유알엘엔코디드를 통해서 가능
     const content = req.body.content //리퀘.바디로 받을 수 있는건 app에서 제이슨,유알엘엔코디드를 통해서 가능
@@ -104,7 +109,7 @@ router.post("/save", upload.single("upfile"), async(req,res,next) => {
 	}
 });
 
-router.post("/put",upload.single("upfile"),async (req,res,next) => {
+router.post("/put",isUser,upload.single("upfile"),async (req,res,next) => {
     let { title, writer, comment, id } = req.body;
 	let connect, result, sql, values;
 	try {
@@ -139,7 +144,7 @@ router.post("/put",upload.single("upfile"),async (req,res,next) => {
 	}
 });
 
-router.get('/view/:id', async (req, res, next) => {
+router.get('/view/:id', isUser, async (req, res, next) => {
 	let id = req.params.id;
 	let pugVals = {cssFile: "board", jsFile: "board"};
 	let sql = "SELECT * FROM board WHERE id=?";
@@ -152,6 +157,7 @@ router.get('/view/:id', async (req, res, next) => {
 		pugVals.data.created = moment(pugVals.data.created).format('YYYY-MM-DD HH:mm:ss');
 		if(pugVals.data.savename) pugVals.data.src = imgSrc(pugVals.data.savename);
 		if(pugVals.data.savename) pugVals.data.file = pugVals.data.oriname; 
+		pugVals.user=req.session.user;
 		res.render('board/view.pug', pugVals);
 	}
 	catch (e) {
@@ -161,7 +167,7 @@ router.get('/view/:id', async (req, res, next) => {
 })
 
 
-router.get("/remove/:id", async (req,res,next) => {
+router.get("/remove/:id", isUser, async (req,res,next) => {
     let id = req.params.id;
 	let sql, connect, result, filePath;
 	try {
@@ -183,7 +189,7 @@ router.get("/remove/:id", async (req,res,next) => {
 	}
 });
 
-router.get("/download/:id", async(req,res,next) => {
+router.get("/download/:id",isUser, async(req,res,next) => {
     const id = req.params.id;
 	const sql = "SELECT * FROM board WHERE id=" + id;
 	let connect, result;
@@ -200,7 +206,7 @@ router.get("/download/:id", async(req,res,next) => {
 	}
 });
 
-router.get('/rm-file/:id', async (req, res, next) => {
+router.get('/rm-file/:id',isUser, async (req, res, next) => {
 	let id = req.params.id;
 	let sql, connect, result;
 	try {

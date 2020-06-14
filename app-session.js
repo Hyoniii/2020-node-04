@@ -3,15 +3,12 @@ const app = express();
 const path = require("path");
 const createError = require('http-errors');
 const session = require("express-session"); //함수형태로 리턴
-
-const cookieParser = require("cookie-parser")
-
+const mySqlSession = require("express-mysql-session")(session);
 const {alert} = require("./modules/util.js")
 require("dotenv").config();
 const {pool} = require("./modules/mysql-conn");  //dotenv를 불러와야 pool사용가능
 const { test } = require("./modules/auth-conn")
-const passport = require("passport");
-const passportModule = require("./passport")
+
 
 /*  Server */
 app.listen(process.env.PORT, () => {
@@ -31,7 +28,7 @@ app.use("/", express.static(path.join(__dirname, "./public"))); //일종의 라�
 app.use("/storage", express.static(path.join(__dirname, "./upload")));  
 
 /* Session */
-app.use(cookieParser(process.env.PASS_SALT))
+const sessionStore = new mySqlSession({},pool)
 app.use(session({         //함수로 리턴한걸 사용()해서 미들웨어 세우는 것
     key: "node-board",
     secret: process.env.PASS_SALT,
@@ -40,7 +37,8 @@ app.use(session({         //함수로 리턴한걸 사용()해서 미들웨어 �
     cookie: {
         httpOnly: true,
         secure: process.env.SERVICE === "production" ? true : false
-    }
+    },
+    store: sessionStore 
     /* new mySqlSession({
         host:process.env.DB_HOST,
         port:process.env.DB_PORT,
@@ -49,10 +47,6 @@ app.use(session({         //함수로 리턴한걸 사용()해서 미들웨어 �
         database:process.env.DB_DATABASE,
     }) */
 })); 
-
-passportModule(passport);
-app.use(passport.initialize());
-app.use(passport.session());
 
 
 /* Router */
