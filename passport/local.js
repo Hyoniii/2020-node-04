@@ -5,7 +5,7 @@ const {pool} = require("../modules/mysql-conn");
 
 
 
-const cb = (userid,userpw,done) => {
+const cb = async (userid,userpw,done) => {
     let sql, result,connect;
     try{
         sql = "SELECT * FROM board WHERE userid=?"
@@ -27,9 +27,9 @@ const cb = (userid,userpw,done) => {
 }
 
 
-module.exports =(passport) => {
+module.exports = (passport) => {
     passport.use(new LocalStorategy({
         usernameField: "userid",
         passwordField: "userpw"
-    }),cb);
+    }, cb));
 }

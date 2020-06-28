@@ -18,7 +18,7 @@ router.get("/login",isGuest,(req,res,next) => {
 });
 
 router.get("/logout", isUser, (req,res,next) => {
-    req.session.destroy();
+    req.logout();
     req.app.locals.user = null;
     res.send(alert("로그아웃 되었습니다.","/"))
 });
@@ -57,6 +57,11 @@ router.post("/auth",async (req,res,next)=> {
     
 });
 
+
+router.get("/kakao", passport.authenticate('kakao'));
+router.get("/kakao/cb", passport.authenticate('kakao', {failureRedirect: "/"}), (req, res) => {
+	res.redirect("/");
+});
 
 
 module.exports = router;

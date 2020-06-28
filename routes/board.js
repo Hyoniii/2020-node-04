@@ -40,7 +40,7 @@ router.get(["/","/list","/list/:page"], async (req,res,next) => {  //경로를 �
         })
         pugVals.lists = lists;
 		//res.json(result[0]);
-		pugVals.user = req.session.user;
+		pugVals.user = req.user;
         res.render("board/list.pug", pugVals)
     }
     catch(err) {
@@ -54,7 +54,7 @@ router.get("/write", isUser, isGrant2,(req,res,next) => {
         cssFile : "board",
         jsFile : "board"
 	}
-	pugVals.user=req.session.user;
+	pugVals.user = req.user;
     res.render("board/write.pug", pugVals)
 })
 router.get('/update/:id', isUser, async (req, res, next) => {
